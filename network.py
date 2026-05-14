@@ -123,7 +123,7 @@ class Network:
 
                 for layer in self.layers:
                     layer.update(lr=lr)
-            if epoch % 100 == 0:
+            if epoch > 0 and epoch % 100 == 0:
                 lr *= 0.8
             accuracy = correct / len(x) * 100
             print(f"Epoch {epoch + 1}, loss = {epoch_loss} train accuracy = {accuracy:.1f}% LR: {lr}")
