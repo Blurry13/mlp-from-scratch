@@ -65,10 +65,8 @@ def dataToNumericalConverter(data):
     return converted, converted.shape[1], featureConfig
 
 
-def loadAndPrepareData():
-    root = Tk()
-    root.withdraw()
-    df = loadFile(filedialog.askopenfilename())
+def loadAndPrepareData(*,filePath):
+    df = loadFile(filePath)
     dataClassColumn = df.pop(
         input(f"Enter the name of the column that represents the classes \n ({df.columns.to_list()}): "))
     DataFrameClass = pd.DataFrame(dataClassColumn)

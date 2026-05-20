@@ -4,32 +4,32 @@ from layer import Layer
 
 
 class Network:
-    def __init__(self, *, layersNum=None, dataSize, targetSize, WeightsConfFilePath=None, BiasesConfFilePath=None, ParametersConfFilePath=None):
+    def __init__(self, *, dataSize, targetSize, WeightsConfFilePath=None, BiasesConfFilePath=None, ParametersConfFilePath=None, NetworkParametersCLI=None):
         self.layers = []
         self.trainingHistory = []
-        if WeightsConfFilePath is None and BiasesConfFilePath is None and ParametersConfFilePath is None:
-            if layersNum < 1:
+        if WeightsConfFilePath is None and BiasesConfFilePath is None and ParametersConfFilePath is None and NetworkParametersCLI is not None:
+            if NetworkParametersCLI["layersNum"] < 1:
                 raise ValueError("The network must have at least one layer")
-            self.layersNum = layersNum
-            for i in range(self.layersNum):
-                self.activation_function = input(f"Enter the activation function for layer {i + 1} (tanh, sigmoid, relu, softmax): ").strip().lower()
+            self.layersNum = NetworkParametersCLI["layersNum"]
+            for index,layer in enumerate(NetworkParametersCLI["layers"]):
+                self.activation_function = NetworkParametersCLI["layers"][layer][1]
 
-                if i == 0:
+                if index == 0:
                     self.inputSize = dataSize
                 else:
-                    self.inputSize = self.layers[i - 1].neuronsNum
+                    self.inputSize = self.layers[index - 1].neuronsNum
 
-                if i == self.layersNum - 1:
+                if index == self.layersNum - 1:
                     self.neuronsNum = targetSize
                 else:
-                    self.neuronsNum = int(input(f"Enter the number of neurons for layer {i + 1}: "))
+                    self.neuronsNum = NetworkParametersCLI["layers"][layer][0]
 
                 self.layers.append(Layer(input_size=self.inputSize, neuronsNum=self.neuronsNum,
                                          activation_function_name=self.activation_function))
 
-            self.lossFunction = input("Enter the loss function(mse, crossentropy): ").strip().lower()
+            self.lossFunction = NetworkParametersCLI["lossFunction"]
 
-        elif WeightsConfFilePath is not None and BiasesConfFilePath is not None and ParametersConfFilePath is not None:
+        elif WeightsConfFilePath is not None and BiasesConfFilePath is not None and ParametersConfFilePath is not None and NetworkParametersCLI is None:
             fParams = open(ParametersConfFilePath)
             networkParameters = json.load(fParams)
             self.layersNum = len(networkParameters["layers"])
