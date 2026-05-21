@@ -4,7 +4,7 @@ import plotsModule as pM
 import argparse
 
 def training_network(*,networkParametersCLI,filePath):
-    x, y, data_size, target_size, featureConfig, targetConfig = cM.loadAndPrepareData(filePath=filePath)
+    x, y, data_size, target_size, featureConfig, targetConfig = cM.loadAndPrepareData(filePath=filePath,targetColumn=networkParametersCLI["targetColumn"])
     xTest, yTest, xTrain, yTrain= cM.splitData(x, y, percent=networkParametersCLI["testSplitPercent"])
     model = Network(dataSize=data_size, targetSize=target_size,NetworkParametersCLI = networkParametersCLI)
     print(model)
@@ -14,10 +14,9 @@ def training_network(*,networkParametersCLI,filePath):
     model.saveNetworkTrainingHistory()
     pM.generateTrainingPlots(filePath = "./NetworkTrainingHistory.json")
     print(featureConfig)
-    print(targetConfig)
 
 def read_data_from_file(*,filePath):
-    x, y, data_size, target_size, featureConfig, targetConfig = cM.loadAndPrepareData(filePath=filePath)
+    x, y, data_size, target_size, featureConfig, targetConfig = cM.loadAndPrepareData(filePath=filePath,targetColumn=networkParametersCLI["targetColumn"])
     model = Network(dataSize=data_size, targetSize=target_size, WeightsConfFilePath="./NetworkWeights.npz", BiasesConfFilePath="./NetworkBiases.npz", ParametersConfFilePath="./NetworkParameters.json")
     print(model)
     model.evaluateNetwork(x=x, y=y)
@@ -37,10 +36,12 @@ def define_parser():
     parser_train.add_argument("-ttap","--target_train_accuracy_percent",type=float,required=True,help="Stop training when the model reaches this accuracy on the training set. Must be between 0 and 100. For example, 60 means training stops after reaching at least 60 percent training accuracy")
     parser_train.add_argument("-tsp","--test_split_percent",type=float,required=True,help="Percentage of the dataset used for testing. For example, 30 means 30 percent of the data will be used for testing, and the remaining 70 percent will be used for training")
     parser_train.add_argument("-fp","--file_path",help="Path to the dataset file",required=True,type=str)
+    parser_train.add_argument("-tc", "--target_column",help="Target column name from dataset",required=True,type=str)
 
     parser_eval = subparsers.add_parser("eval", help="Evaluate the network")
 
     parser_eval.add_argument("-fp","--file_path",help="Path to the dataset file",required=True,type=str)
+    parser_eval.add_argument("-tc", "--target_column", help="Target column name from dataset", required=True, type=str)
 
     return parser
 
@@ -62,6 +63,7 @@ if __name__ == "__main__":
             "epochs": args.epochs,
             "targetTrainAccuracyPercent": args.target_train_accuracy_percent,
             "testSplitPercent": args.test_split_percent,
+            "targetColumn": args.target_column,
         }
 
         training_network(networkParametersCLI = networkParametersCLI,filePath=args.file_path)

@@ -64,18 +64,6 @@ def dataToNumericalConverter(data):
     converted = pd.concat(parts, axis=1).to_numpy()
     return converted, converted.shape[1], featureConfig
 
-
-def loadAndPrepareData(*,filePath):
-    df = loadFile(filePath)
-    dataClassColumn = df.pop(
-        input(f"Enter the name of the column that represents the classes \n ({df.columns.to_list()}): "))
-    DataFrameClass = pd.DataFrame(dataClassColumn)
-    x, data_size, featureConfig = dataToNumericalConverter(df)
-    y, target_size, targetConfig = dataToNumericalConverterForTargets(DataFrameClass)
-
-    return x, y, data_size, target_size, featureConfig, targetConfig
-
-
 def splitData(x, y, *, percent, seed=42):
     if len(x) != len(y):
         raise ValueError("x and y must have the same number of samples")
@@ -93,3 +81,15 @@ def splitData(x, y, *, percent, seed=42):
     yTrain = np.delete(y, slice(0, int(len(y) * percent / 100)), axis=0)
 
     return xTest, yTest, xTrain, yTrain
+
+def loadAndPrepareData(*,filePath,targetColumn):
+    df = loadFile(filePath)
+    #dataClassColumn = df.pop(input(f"Enter the name of the column that represents the classes \n ({df.columns.to_list()}): "))
+    dataClassColumn = df.pop(targetColumn)
+    DataFrameClass = pd.DataFrame(dataClassColumn)
+    x, data_size, featureConfig = dataToNumericalConverter(df)
+    y, target_size, targetConfig = dataToNumericalConverterForTargets(DataFrameClass)
+
+    return x, y, data_size, target_size, featureConfig, targetConfig
+
+
